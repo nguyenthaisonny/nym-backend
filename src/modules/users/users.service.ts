@@ -74,6 +74,10 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
+  async findOneByEmail(email: string) {
+    return this.userModel.findOne({email})
+  }
+
   async update({_id, ...rest}: UpdateUserDto) {
     return await this.userModel.updateOne({_id: _id}, {...rest})
   }
