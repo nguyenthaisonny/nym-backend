@@ -11,18 +11,17 @@ export class AuthService {
 
   ) {}
 
-  async signIn(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOneByEmail(username);
-    if (!user) throw new UnauthorizedException("Incorrect username!");
-
-    const isValidPassword = await comparePasswordHelper(pass, user.password)
-    if (!isValidPassword) throw new UnauthorizedException("Incorrect password!");
-
-    const { password, ...result } = user;
-    // TODO: Generate a JWT and return it here
+  async login(user: any) {
     const payload = { sub: user._id, username: user.email };
     return {
       access_token: await this.jwtService.signAsync(payload),
     }
+  }
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOneByEmail(username);
+    const isValidPassword = await comparePasswordHelper(pass, user.password)
+    if(!user || !isValidPassword) return null
+    return user;
   }
 }
