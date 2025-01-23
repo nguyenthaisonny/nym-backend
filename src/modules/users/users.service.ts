@@ -9,10 +9,14 @@ import aqp from 'api-query-params';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid'
 import * as dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly mailerService: MailerService
+  ) {}
   async create(createUserDto: CreateUserDto) {
     const {password, email, phone, address, image} = createUserDto;
     const errors: string[] = [];
@@ -94,6 +98,7 @@ export class UsersService {
     const {password, email, name } = registerDto;
     const errors: string[] = [];
     const isEmailExist = await this.isEmailExist(email);
+    const codeId = uuidv4()
     if(isEmailExist) errors.push(`This email: ${email} has already existed!`)
     if(errors.length > 0) throw new BadRequestException(errors.join('|'));
     const hashPassword = await hashPasswordHelper(password);
@@ -102,17 +107,25 @@ export class UsersService {
         ...registerDto, 
         password: hashPassword,
         isActive: false,
-        codeId: uuidv4(),
+        codeId,
         codeExpired: dayjs().add(1, 'day')
       }
     )
     if(!user) throw new BadRequestException('Fail to register!')
 
     //send email
-
+    await this.mailerService.sendMail({
+      to: user?.email, // list of receivers
+      subject: 'Activate ypur account at @nguyenthaisonny ✔', // Subject lineT
+      template: 'register.hbs',// HTML body content
+      context: {
+        name: user?.name ?? user?.email,
+        activationCode: codeId
+      }
+    });
 
     return {
-      _id: user._id,
+      _id: user?._id,
       email,
     };
   }

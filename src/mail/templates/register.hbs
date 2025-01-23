@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Activation Email</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #4a4a4a;
+        }
+
+        .email-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #ffffff, #f8f9fb);
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .email-header {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: #ffffff;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .email-header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .email-header p {
+            margin: 10px 0 0;
+            font-size: 18px;
+        }
+
+        .email-body {
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .email-body p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .email-body h2 {
+            font-size: 28px;
+            color: #2575fc;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin: 30px 0;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: #ffffff;
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .activation-code {
+            font-size: 22px;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            color: #2575fc;
+            padding: 14px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 20px 0;
+            letter-spacing: 1.2px;
+        }
+
+        .email-footer {
+            background-color: #f8f9fb;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .email-footer a {
+            color: #2575fc;
+            text-decoration: none;
+        }
+
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media only screen and (max-width: 700px) {
+            .email-body {
+                padding: 20px;
+            }
+
+            .email-header h1 {
+                font-size: 24px;
+            }
+
+            .email-body h2 {
+                font-size: 22px;
+            }
+
+            .cta-button {
+                font-size: 16px;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>Welcome to Our Community!</h1>
+            <p>Activate your account to get started</p>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <p>Hi <strong>{{name}}</strong>,</p>
+            <p>We're excited to have you onboard! Use the activation code below to activate your account:</p>
+
+            <!-- Activation Code -->
+            <div class="activation-code">{{activationCode}}</div>
+
+            <p>Alternatively, click the button below to activate instantly:</p>
+
+            <!-- CTA Button -->
+            {{!-- <a href="{{activationLink}}" class="cta-button">Activate My Account</a> --}}
+
+            <p>If you didn’t sign up for an account, please disregard this email.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            <p>Need help? <a href="#">Contact Support</a></p>
+            <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>
+
