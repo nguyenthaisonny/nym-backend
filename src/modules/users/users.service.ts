@@ -6,6 +6,9 @@ import mongoose, { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { hashPasswordHelper } from '@/helpers/utils';
 import aqp from 'api-query-params';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid'
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class UsersService {
@@ -85,5 +88,32 @@ export class UsersService {
   async remove(_id: string) {
     if(!mongoose.isValidObjectId(_id)) throw new BadRequestException('Invalid _id!')
     return this.userModel.deleteOne({_id: _id});
+  }
+
+  async handleRegister(registerDto: CreateAuthDto) {
+    const {password, email, name } = registerDto;
+    const errors: string[] = [];
+    const isEmailExist = await this.isEmailExist(email);
+    if(isEmailExist) errors.push(`This email: ${email} has already existed!`)
+    if(errors.length > 0) throw new BadRequestException(errors.join('|'));
+    const hashPassword = await hashPasswordHelper(password);
+    const user = await this.userModel.create(
+      {
+        ...registerDto, 
+        password: hashPassword,
+        isActive: false,
+        codeId: uuidv4(),
+        codeExpired: dayjs().add(1, 'day')
+      }
+    )
+    if(!user) throw new BadRequestException('Fail to register!')
+
+    //send email
+
+
+    return {
+      _id: user._id,
+      email,
+    };
   }
 }
