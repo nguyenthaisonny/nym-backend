@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -20,10 +19,10 @@ import { JwtStrategy } from './passport/jwt.strategy';
           secret: configService.get<string>('JWT_SECRET'),
           signOptions: {
             expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_EXPIRED'),
-          }
+          },
         };
       },
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     PassportModule,
   ],
