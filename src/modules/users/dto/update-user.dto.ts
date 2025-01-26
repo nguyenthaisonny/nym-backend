@@ -12,3 +12,15 @@ export class UpdateUserDto extends OmitType(CreateUserDto, [
   @IsOptional()
   name: string;
 }
+
+export class CodeAuthDto {
+  @IsMongoId({ message: 'Invalid _id!' })
+  _id: string;
+  @IsNotEmpty()
+  code: string;
+}
+
+export class ResendCodeDto {
+  @IsNotEmpty()
+  email: string;
+}

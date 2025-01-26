@@ -10,6 +10,7 @@ import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
+import { FindOneUserByIdDto } from './dto/filter-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -79,8 +80,8 @@ export class UsersService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return this.userModel.findOne({ _id: id });
   }
 
   async findOneByEmail(email: string) {
@@ -91,10 +92,24 @@ export class UsersService {
     return await this.userModel.updateOne({ _id: _id }, { ...rest });
   }
 
+  async activeAccount(id: string) {
+    return await this.userModel.updateOne({ _id: id }, { isActive: true });
+  }
+
   async remove(_id: string) {
     if (!mongoose.isValidObjectId(_id))
       throw new BadRequestException('Invalid _id!');
     return this.userModel.deleteOne({ _id: _id });
+  }
+
+  async regenerateCodeId(id: string) {
+    return await this.userModel.updateOne(
+      { _id: id },
+      {
+        codeId: uuidv4(),
+        codeExpired: dayjs().add(30, 'minutes'),
+      },
+    );
   }
 
   async handleRegister(registerDto: CreateAuthDto) {
@@ -110,14 +125,14 @@ export class UsersService {
       password: hashPassword,
       isActive: false,
       codeId,
-      codeExpired: dayjs().add(1, 'day'),
+      codeExpired: dayjs().add(30, 'minutes'),
     });
     if (!user) throw new BadRequestException('Fail to register!');
 
     //send email
     await this.mailerService.sendMail({
       to: user?.email, // list of receivers
-      subject: 'Activate ypur account at @nguyenthaisonny ✔', // Subject lineT
+      subject: 'Activate your account at @nguyenthaisonny ✔', // Subject lineT
       template: 'register.hbs', // HTML body content
       context: {
         name: user?.name ?? user?.email,

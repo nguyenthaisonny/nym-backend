@@ -2,6 +2,7 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import {
   BadGatewayException,
+  BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -19,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Incorrect username or password!');
     }
     if (user?.isActive === false)
-      throw new BadGatewayException('Your account is not activated!');
+      throw new BadRequestException('Your account is not activated!');
     const { password: pass, ...rest } = user;
     return user;
   }
