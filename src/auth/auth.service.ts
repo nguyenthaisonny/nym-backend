@@ -68,9 +68,11 @@ export class AuthService {
   async handleResendCode(resendCodeDto: ResendCodeDto) {
     const user = await this.usersService.findOneByEmail(resendCodeDto.email);
     if (!user) throw new BadRequestException('This email has not registered');
-    const regenrateCode = await this.usersService.regenerateCodeId(
-      user._id as unknown as string,
-    );
+    const regenrateCode = await this.usersService.regenerateCodeId({
+      _id: user._id.toString(),
+      numDuration: 30,
+      typeOfTime: 'minutes',
+    });
     if (!regenrateCode.acknowledged)
       throw new BadRequestException('Generate code fail');
     const { codeId } = await this.usersService.findOneByEmail(
@@ -102,20 +104,26 @@ export class AuthService {
     const { codeId, codeExpired } = user;
     const isBeforeCheck = dayjs().isBefore(codeExpired);
     if (!isBeforeCheck) throw new BadRequestException('This code has expired');
-    if (code !== codeId) throw new BadRequestException('Wrong forgot password code');
-    const forgotPassword = await this.usersService.updatePassword(_id, newPassword);
+    if (code !== codeId)
+      throw new BadRequestException('Wrong forgot password code');
+    const forgotPassword = await this.usersService.updatePassword(
+      _id,
+      newPassword,
+    );
     if (!forgotPassword.acknowledged)
       throw new BadGatewayException('Runtime error');
-    
+
     return forgotPassword;
   }
 
   async handleRetryPassword(resendCodeDto: ResendCodeDto) {
     const user = await this.usersService.findOneByEmail(resendCodeDto.email);
     if (!user) throw new BadRequestException('This email has not registered');
-    const regenrateCode = await this.usersService.regenerateCodeId(
-      user._id as unknown as string,
-    );
+    const regenrateCode = await this.usersService.regenerateCodeId({
+      _id: user._id.toString(),
+      numDuration: 30,
+      typeOfTime: 'minutes',
+    });
     if (!regenrateCode.acknowledged)
       throw new BadRequestException('Generate code fail');
     const { codeId } = await this.usersService.findOneByEmail(

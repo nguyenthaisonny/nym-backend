@@ -1,6 +1,6 @@
-import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { OmitType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsMongoId, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEnum, IsMongoId, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class UpdateUserDto extends OmitType(CreateUserDto, [
   'password',
@@ -29,7 +29,16 @@ export class ForgotPasswordDto {
   @IsMongoId({ message: 'Invalid _id!' })
   _id: string;
   @IsNotEmpty()
-  code: string; 
+  code: string;
   @IsNotEmpty()
-  newPassword: string
+  newPassword: string;
+}
+
+export class GenerateCodeIdDto {
+  @IsMongoId({ message: 'Invalid _id!' })
+  _id: string;
+  @IsOptional()
+  numDuration: number;
+  @IsOptional()
+  typeOfTime: 'day' | 'minutes' | 'seconds';
 }

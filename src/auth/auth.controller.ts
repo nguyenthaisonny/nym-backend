@@ -50,7 +50,7 @@ export class AuthController {
   async resendCode(@Body() resendCodeDto: ResendCodeDto) {
     return this.authService.handleResendCode(resendCodeDto);
   }
-  @Post('retry-password') 
+  @Post('retry-password')
   @Public()
   async retryPassword(@Body() resendCodeDto: ResendCodeDto) {
     return this.authService.handleRetryPassword(resendCodeDto);

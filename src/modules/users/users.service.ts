@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { GenerateCodeIdDto, UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
@@ -10,7 +10,6 @@ import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
-import { FindOneUserByIdDto } from './dto/filter-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -75,8 +74,13 @@ export class UsersService {
       .select('-password')
       .sort(sort as any);
     return {
+      meta: {
+        current,
+        pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
       results,
-      totalPages,
     };
   }
 
@@ -92,8 +96,8 @@ export class UsersService {
     return await this.userModel.updateOne({ _id: _id }, { ...rest });
   }
 
-  async activeAccount(id: string) {
-    return await this.userModel.updateOne({ _id: id }, { isActive: true });
+  async activeAccount(_id: string) {
+    return await this.userModel.updateOne({ _id: _id }, { isActive: true });
   }
 
   async remove(_id: string) {
@@ -102,26 +106,29 @@ export class UsersService {
     return this.userModel.deleteOne({ _id: _id });
   }
 
-  async regenerateCodeId(id: string) {
+  async regenerateCodeId({
+    _id,
+    numDuration = 1,
+    typeOfTime = 'day',
+  }: GenerateCodeIdDto) {
     return await this.userModel.updateOne(
-      { _id: id },
+      { _id: _id },
       {
         codeId: uuidv4(),
-        codeExpired: dayjs().add(30, 'minutes'),
+        codeExpired: dayjs().add(numDuration, typeOfTime),
       },
     );
   }
 
-  async updatePassword(id:string, newPassword: string) {
+  async updatePassword(id: string, newPassword: string) {
     const hashPassword = await hashPasswordHelper(newPassword);
     return await this.userModel.updateOne(
       { _id: id },
       {
-        password: hashPassword
+        password: hashPassword,
       },
     );
   }
-
 
   async handleRegister(registerDto: CreateAuthDto) {
     const { password, email, name } = registerDto;
