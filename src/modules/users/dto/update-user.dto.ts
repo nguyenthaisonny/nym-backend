@@ -24,3 +24,12 @@ export class ResendCodeDto {
   @IsNotEmpty()
   email: string;
 }
+
+export class ForgotPasswordDto {
+  @IsMongoId({ message: 'Invalid _id!' })
+  _id: string;
+  @IsNotEmpty()
+  code: string; 
+  @IsNotEmpty()
+  newPassword: string
+}

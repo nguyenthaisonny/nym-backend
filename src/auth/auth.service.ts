@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import {
   CodeAuthDto,
+  ForgotPasswordDto,
   ResendCodeDto,
 } from '@/modules/users/dto/update-user.dto';
 import * as dayjs from 'dayjs';
@@ -78,6 +79,51 @@ export class AuthService {
     await this.mailerService.sendMail({
       to: user?.email, // list of receivers
       subject: 'Activate your account at @nguyenthaisonny ✔', // Subject lineT
+      template: 'register.hbs', // HTML body content
+      context: {
+        name: user?.name ?? user?.email,
+        activationCode: codeId,
+      },
+    });
+    return {
+      user: {
+        _id: user.id,
+        newCode: codeId,
+      },
+    };
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const { _id, code, newPassword } = forgotPasswordDto;
+    const user = await this.usersService.findOne(_id);
+    if (!user) {
+      throw new BadRequestException('Invalid user!');
+    }
+    const { codeId, codeExpired } = user;
+    const isBeforeCheck = dayjs().isBefore(codeExpired);
+    if (!isBeforeCheck) throw new BadRequestException('This code has expired');
+    if (code !== codeId) throw new BadRequestException('Wrong forgot password code');
+    const forgotPassword = await this.usersService.updatePassword(_id, newPassword);
+    if (!forgotPassword.acknowledged)
+      throw new BadGatewayException('Runtime error');
+    
+    return forgotPassword;
+  }
+
+  async handleRetryPassword(resendCodeDto: ResendCodeDto) {
+    const user = await this.usersService.findOneByEmail(resendCodeDto.email);
+    if (!user) throw new BadRequestException('This email has not registered');
+    const regenrateCode = await this.usersService.regenerateCodeId(
+      user._id as unknown as string,
+    );
+    if (!regenrateCode.acknowledged)
+      throw new BadRequestException('Generate code fail');
+    const { codeId } = await this.usersService.findOneByEmail(
+      resendCodeDto.email,
+    );
+    await this.mailerService.sendMail({
+      to: user?.email, // list of receivers
+      subject: 'Change your password at @nguyenthaisonny ✔', // Subject lineT
       template: 'register.hbs', // HTML body content
       context: {
         name: user?.name ?? user?.email,

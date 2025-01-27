@@ -112,6 +112,17 @@ export class UsersService {
     );
   }
 
+  async updatePassword(id:string, newPassword: string) {
+    const hashPassword = await hashPasswordHelper(newPassword);
+    return await this.userModel.updateOne(
+      { _id: id },
+      {
+        password: hashPassword
+      },
+    );
+  }
+
+
   async handleRegister(registerDto: CreateAuthDto) {
     const { password, email, name } = registerDto;
     const errors: string[] = [];
@@ -139,7 +150,6 @@ export class UsersService {
         activationCode: codeId,
       },
     });
-
     return {
       _id: user?._id,
       email,

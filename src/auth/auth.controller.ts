@@ -16,6 +16,7 @@ import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { Public, ResponMessagae } from '@/decorators/customs';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import {
+  ForgotPasswordDto,
   CodeAuthDto,
   ResendCodeDto,
 } from '@/modules/users/dto/update-user.dto';
@@ -48,5 +49,16 @@ export class AuthController {
   @Public()
   async resendCode(@Body() resendCodeDto: ResendCodeDto) {
     return this.authService.handleResendCode(resendCodeDto);
+  }
+  @Post('retry-password') 
+  @Public()
+  async retryPassword(@Body() resendCodeDto: ResendCodeDto) {
+    return this.authService.handleRetryPassword(resendCodeDto);
+  }
+
+  @Post('forgot-password')
+  @Public()
+  async forgotPassword(@Body() forgotPassword: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPassword);
   }
 }
