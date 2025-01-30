@@ -71,7 +71,7 @@ export class UsersService {
       .find(filter)
       .limit(pageSize)
       .skip(skip)
-      .select('-password')
+      .select(['-password', '-codeId'])
       .sort(sort as any);
     return {
       meta: {
@@ -158,8 +158,10 @@ export class UsersService {
       },
     });
     return {
-      _id: user?._id,
-      email,
+      user: {
+        _id: user?._id,
+        email,
+      }
     };
   }
 }
