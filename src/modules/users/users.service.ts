@@ -25,7 +25,7 @@ export class UsersService {
 
     const isEmailExist = await this.isEmailExist(email);
     if (isEmailExist) errors.push(`This email: ${email} has already existed!`);
-    if (errors.length > 0) throw new BadRequestException(errors.join('|'));
+    if (errors.length > 0) throw new BadRequestException(errors.join('\n'));
     const hashPassword = await hashPasswordHelper(password);
     const user = await this.userModel.create({
       ...createUserDto,
@@ -91,8 +91,13 @@ export class UsersService {
   async findOneByEmail(email: string) {
     return this.userModel.findOne({ email });
   }
+  async findOnebByPhone(phone: string) {
+    return this.userModel.findOne({ phone });
+  }
 
   async update({ _id, ...rest }: UpdateUserDto) {
+    const isPhoneExist = await this.isPhoneExist(rest.phone);
+    if(isPhoneExist) throw new BadRequestException(`This phone ${rest.phone} has already existed!`);
     return await this.userModel.updateOne({ _id: _id }, { ...rest });
   }
 
